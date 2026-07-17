@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Nabeeh Bank V2 Ultra API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: dashboard
+    description: Dashboard and account summary
+  - name: transactions
+    description: Transaction operations
+  - name: cards
+    description: Card management
+  - name: insights
+    description: AI-powered financial insights
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,226 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [auth]
+      summary: Login with credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logoutUser
+      tags: [auth]
+      summary: Logout current user
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /transactions:
+    get:
+      operationId: getTransactions
+      tags: [transactions]
+      summary: List all transactions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [credit, debit]
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+  /transactions/{id}:
+    get:
+      operationId: getTransaction
+      tags: [transactions]
+      summary: Get a single transaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /cards:
+    get:
+      operationId: getCards
+      tags: [cards]
+      summary: Get user cards
+      responses:
+        "200":
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+
+  /cards/{id}/freeze:
+    patch:
+      operationId: toggleCardFreeze
+      tags: [cards]
+      summary: Freeze or unfreeze a card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardFreezeToggle"
+      responses:
+        "200":
+          description: Card updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+
+  /insights:
+    get:
+      operationId: getInsights
+      tags: [insights]
+      summary: Get AI financial insights
+      responses:
+        "200":
+          description: List of insights
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Insight"
+
+  /spending:
+    get:
+      operationId: getSpending
+      tags: [dashboard]
+      summary: Get spending breakdown by category
+      responses:
+        "200":
+          description: Spending categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpendingCategory"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +260,176 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    UserRegistration:
+      type: object
+      required: [fullName, email, phone, password]
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        signatureData:
+          type: ["string", "null"]
+
+    UserLogin:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+
+    User:
+      type: object
+      required: [id, fullName, email, phone, createdAt]
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        hasSignature:
+          type: boolean
+        signatureData:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    DashboardSummary:
+      type: object
+      required: [balance, savingsBalance, totalIncome, totalExpenses, healthScore, savingsGoalPercent, daysToSalary, cardNumber]
+      properties:
+        balance:
+          type: number
+        savingsBalance:
+          type: number
+        totalIncome:
+          type: number
+        totalExpenses:
+          type: number
+        healthScore:
+          type: integer
+        savingsGoalPercent:
+          type: integer
+        daysToSalary:
+          type: integer
+        cardNumber:
+          type: string
+        monthlyChange:
+          type: number
+
+    Transaction:
+      type: object
+      required: [id, title, subtitle, amount, type, category, date, icon]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [credit, debit]
+        category:
+          type: string
+          enum: [food, shopping, bills, transport, salary, entertainment, other]
+        date:
+          type: string
+        icon:
+          type: string
+
+    Card:
+      type: object
+      required: [id, number, holderName, expiryDate, isFrozen, type]
+      properties:
+        id:
+          type: string
+        number:
+          type: string
+        holderName:
+          type: string
+        expiryDate:
+          type: string
+        isFrozen:
+          type: boolean
+        type:
+          type: string
+          enum: [visa, mastercard]
+        balance:
+          type: number
+
+    CardFreezeToggle:
+      type: object
+      required: [frozen]
+      properties:
+        frozen:
+          type: boolean
+
+    Insight:
+      type: object
+      required: [id, type, title, message]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [saving, prediction, subscription, fraud]
+        title:
+          type: string
+        message:
+          type: string
+        actionLabel:
+          type: ["string", "null"]
+
+    SpendingCategory:
+      type: object
+      required: [name, amount, color, icon]
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+        color:
+          type: string
+        icon:
+          type: string
