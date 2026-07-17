@@ -4,11 +4,7 @@ import { useGetMe } from '@workspace/api-client-react';
 
 export function useRequireAuth() {
   const [, setLocation] = useLocation();
-  const { data: user, isError, isLoading } = useGetMe({
-    query: {
-      retry: false
-    }
-  });
+  const { data: user, isError, isLoading } = useGetMe();
 
   useEffect(() => {
     if (isError) {

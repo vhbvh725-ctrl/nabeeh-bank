@@ -8,7 +8,8 @@ import {
   MessageSquare, 
   User, 
   LogOut,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 import { useLogoutUser } from '@workspace/api-client-react';
 import { useAuthStore } from '../lib/auth-store';
@@ -18,6 +19,7 @@ const navItems = [
   { icon: LineChart, label: 'Transactions', href: '/dashboard/transactions' },
   { icon: CreditCard, label: 'Cards', href: '/dashboard/cards' },
   { icon: Sparkles, label: 'Nabeh AI', href: '/dashboard/ai' },
+  { icon: FileText, label: 'Contracts', href: '/dashboard/contracts' },
   { icon: User, label: 'Profile', href: '/dashboard/profile' },
 ];
 

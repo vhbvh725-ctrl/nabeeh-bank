@@ -12,6 +12,7 @@ import Transactions from './pages/dashboard/transactions';
 import Cards from './pages/dashboard/cards';
 import AIChat from './pages/dashboard/ai';
 import Profile from './pages/dashboard/profile';
+import Contracts from './pages/dashboard/contracts';
 import NotFound from './pages/not-found';
 
 const queryClient = new QueryClient({
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/dashboard/cards" component={Cards} />
       <Route path="/dashboard/ai" component={AIChat} />
       <Route path="/dashboard/profile" component={Profile} />
+      <Route path="/dashboard/contracts" component={Contracts} />
       
       <Route component={NotFound} />
     </Switch>
