@@ -1,206 +1,265 @@
-import { useGetMe } from '@workspace/api-client-react';
-import { DashboardLayout } from '../../components/dashboard-layout';
+import { useState } from 'react';
 import { useRequireAuth } from '../../hooks/use-require-auth';
-import { motion } from 'framer-motion';
+import { DashboardLayout } from '../../components/dashboard-layout';
+import { motion, AnimatePresence } from 'framer-motion';
 import { pageVariants, staggerContainer, itemVariants } from '../../lib/animations';
-import { User, Mail, Phone, Shield, FileSignature, LogOut, Brain, Trophy, CheckCircle2, Star, ChevronRight } from 'lucide-react';
+import {
+  User, Camera, Fingerprint, Bell, Lock, Eye, Shield, Globe, HelpCircle,
+  MessageCircle, ChevronRight, Sun, Moon, Star, CheckCircle2, Sparkles,
+  Phone, Mail, MapPin, LogOut, Trash2, BrainCircuit, PenTool, CreditCard,
+  Smartphone, KeyRound, Activity, Award
+} from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { useLogoutUser } from '@workspace/api-client-react';
 import { useAuthStore } from '../../lib/auth-store';
-import { format } from 'date-fns';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
-const dnaData = [
-  { subject: 'Saving',    A: 85, fullMark: 100 },
-  { subject: 'Investing', A: 60, fullMark: 100 },
-  { subject: 'Budgeting', A: 90, fullMark: 100 },
-  { subject: 'Debt Mgmt', A: 75, fullMark: 100 },
-  { subject: 'Planning',  A: 70, fullMark: 100 },
-];
+// ─── Settings Row ─────────────────────────────────────────────────────────────
+function Row({ icon: Icon, iconColor, label, value, onClick, danger = false, toggle, checked, onCheckedChange, badge }: {
+  icon: any; iconColor: string; label: string; value?: string; onClick?: () => void;
+  danger?: boolean; toggle?: boolean; checked?: boolean; onCheckedChange?: (v: boolean) => void; badge?: string;
+}) {
+  const iconBg: Record<string, string> = {
+    gold:'bg-primary/12 border-primary/20', blue:'bg-blue-500/12 border-blue-500/20', emerald:'bg-emerald-500/12 border-emerald-500/20',
+    red:'bg-red-500/12 border-red-500/20', purple:'bg-purple-500/12 border-purple-500/20', cyan:'bg-cyan-500/12 border-cyan-500/20',
+    amber:'bg-amber-500/12 border-amber-500/20', indigo:'bg-indigo-500/12 border-indigo-500/20',
+  };
+  const iconText: Record<string, string> = {
+    gold:'text-primary', blue:'text-blue-400', emerald:'text-emerald-400', red:'text-red-400',
+    purple:'text-purple-400', cyan:'text-cyan-400', amber:'text-amber-400', indigo:'text-indigo-400',
+  };
+  return (
+    <motion.div
+      whileHover={!toggle ? { backgroundColor: 'rgba(255,255,255,0.025)' } : {}}
+      whileTap={!toggle ? { scale: 0.995 } : {}}
+      onClick={!toggle ? onClick : undefined}
+      className={`flex items-center gap-4 px-4 py-3.5 ${!toggle ? 'cursor-pointer' : ''} group transition-colors`}>
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 border ${iconBg[iconColor] ?? 'bg-white/5 border-white/10'}`}>
+        <Icon className={`w-3.5 h-3.5 ${iconText[iconColor] ?? 'text-white'}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium ${danger ? 'text-red-400' : 'text-white'}`}>{label}</p>
+        {value && <p className="text-xs text-muted-foreground/55 truncate mt-0.5">{value}</p>}
+      </div>
+      {badge && <span className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold">{badge}</span>}
+      {toggle && <Switch checked={checked} onCheckedChange={onCheckedChange} />}
+      {!toggle && onClick && <ChevronRight className={`w-4 h-4 flex-shrink-0 ${danger ? 'text-red-400/50' : 'text-muted-foreground/30'} group-hover:${danger ? 'text-red-400/70' : 'text-primary/50'} transition-colors`} />}
+    </motion.div>
+  );
+}
 
-const DNA_BADGES = [
-  { icon: Brain,  color: 'emerald', label: 'Smart Saver',      desc: 'Saves 18% of income consistently'  },
-  { icon: Shield, color: 'blue',    label: 'Low Risk',          desc: 'Prefers stable guaranteed returns' },
-  { icon: Trophy, color: 'primary', label: 'Budget Champion',   desc: 'Top 5% expense-to-income ratio'    },
-];
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <motion.div variants={itemVariants}>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/55 font-bold px-1 mb-2">{title}</p>
+      <div className="glass-float rounded-2xl border border-white/7 card-premium overflow-hidden divide-y divide-white/[0.04]">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
 
-const CHALLENGES = [
-  { label: 'Save 100 SAR this week',        progress: 65, target: 100, unit: 'SAR', reward: 'Gold Badge',   done: false },
-  { label: 'Zero impulse purchases (3 days)', progress: 3, target: 3,  unit: '',    reward: 'Claimed',       done: true  },
-  { label: 'Review all subscriptions',       progress: 0,  target: 1,  unit: '',    reward: 'Silver Badge',  done: false },
-];
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+function Avatar({ name }: { name: string }) {
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  return (
+    <div className="relative group">
+      <motion.div whileHover={{ scale: 1.04 }}
+        className="w-24 h-24 rounded-3xl flex items-center justify-center text-3xl font-bold text-white border-2 border-primary/40 shadow-[0_0_30px_rgba(212,175,55,0.2)] cursor-pointer"
+        style={{ background: 'linear-gradient(135deg,rgba(212,175,55,0.25),rgba(212,175,55,0.08))' }}>
+        {initials}
+      </motion.div>
+      <motion.button whileTap={{ scale: 0.88 }} onClick={() => toast.info('Photo upload coming soon')}
+        className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-primary text-black flex items-center justify-center shadow-[0_0_12px_rgba(212,175,55,0.4)] hover:bg-primary/90 transition-colors">
+        <Camera className="w-3.5 h-3.5" />
+      </motion.button>
+    </div>
+  );
+}
 
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function Profile() {
   const { user } = useRequireAuth();
   const logoutUser = useLogoutUser();
-  const logout = useAuthStore((s) => s.logout);
+  const logout = useAuthStore(s => s.logout);
+
+  const [biometric,    setBiometric]    = useState(true);
+  const [notifications, setNotifications] = useState({ txn: true, bills: true, ai: true, fraud: true, goals: false });
+  const [privacy,      setPrivacy]      = useState({ analytics: true, personalized: true });
+  const [theme,        setTheme]        = useState<'dark' | 'light' | 'auto'>('dark');
+  const [language,     setLanguage]     = useState<'en' | 'ar'>('en');
+  const [twoFA,        setTwoFA]        = useState(true);
 
   const handleLogout = async () => {
     try { await logoutUser.mutateAsync(); } catch {}
     logout();
   };
 
+  const name  = user?.fullName  ?? 'Ahmed Al-Rashid';
+  const email = user?.email     ?? 'ahmed@nabeeh.bank';
+  const phone = user?.phone     ?? '+966 50 000 0000';
+  const firstName = name.split(' ')[0];
+
   return (
     <DashboardLayout>
-      <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="max-w-2xl mx-auto space-y-5 pt-1">
+      <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="space-y-5 pb-4 max-w-2xl mx-auto">
 
-        {/* Identity card */}
+        {/* ── Profile Hero ── */}
         <motion.div variants={itemVariants}
-          className="glass-float rounded-3xl p-5 border border-white/8 card-premium relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-primary/8 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/25 to-primary/5 border border-primary/30 flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-                <User className="w-8 h-8 text-primary" />
-              </div>
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-background flex items-center justify-center">
-                <CheckCircle2 className="w-3 h-3 text-white" />
-              </span>
-            </div>
+          className="glass-float rounded-3xl p-6 border border-white/8 card-premium relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg,rgba(212,175,55,0.06),rgba(10,9,7,0.9))' }}>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-primary/8 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none" />
+          <div className="relative z-10 flex items-start gap-5">
+            <Avatar name={name} />
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-white truncate">{user?.fullName ?? '—'}</h2>
-              <p className="text-muted-foreground text-xs">
-                Member since {user?.createdAt ? format(new Date(user.createdAt), 'MMM yyyy') : 'Recently'}
-              </p>
-              <div className="flex items-center gap-1.5 mt-1.5">
-                <span className="px-2 py-0.5 rounded-full bg-primary/15 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider">Premium</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Verified</span>
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <h1 className="text-xl font-bold text-white">{name}</h1>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/12 border border-emerald-500/25">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <span className="text-emerald-400 text-[10px] font-bold">Verified</span>
+                </div>
+              </div>
+              <p className="text-muted-foreground/70 text-sm mb-3">{email}</p>
+              <div className="flex flex-wrap gap-2">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold">
+                  <Star className="w-3 h-3" /> Ultra Member
+                </span>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-[10px]">
+                  <Activity className="w-3 h-3" /> Health: 91/100
+                </span>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-[10px]">
+                  Member since Jan 2026
+                </span>
               </div>
             </div>
           </div>
-          <div className="mt-4 space-y-2 relative z-10">
-            {[
-              { icon: Mail,  value: user?.email },
-              { icon: Phone, value: user?.phone },
-            ].map(({ icon: Icon, value }) => (
-              <motion.div key={value} whileHover={{ x: 2 }}
-                className="flex items-center gap-3 bg-white/[0.04] hover:bg-white/[0.07] transition-colors px-3 py-2.5 rounded-xl border border-white/5 cursor-default">
-                <Icon className="w-4 h-4 text-muted-foreground/60 flex-shrink-0" />
-                <span className="text-sm text-white/80 truncate">{value ?? '—'}</span>
-              </motion.div>
-            ))}
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-            onClick={handleLogout}
-            className="w-full mt-4 py-2.5 rounded-xl border border-red-500/20 text-red-400 text-sm font-semibold hover:bg-red-500/8 transition-colors flex items-center justify-center gap-2 relative z-10"
-          >
-            <LogOut className="w-4 h-4" /> Sign Out
-          </motion.button>
-        </motion.div>
 
-        {/* Financial DNA badges */}
-        <div>
-          <h3 className="text-sm font-semibold text-muted-foreground/80 uppercase tracking-widest px-1 mb-3">Financial DNA</h3>
-          <motion.div variants={staggerContainer} className="grid grid-cols-3 gap-3">
-            {DNA_BADGES.map(({ icon: Icon, color, label, desc }) => (
-              <motion.div key={label} variants={itemVariants} whileHover={{ y: -2 }}
-                className={`glass-float rounded-2xl p-3.5 border card-premium flex flex-col gap-2 ${
-                  color === 'primary' ? 'border-primary/20' : color === 'emerald' ? 'border-emerald-500/20' : 'border-blue-500/20'
-                }`}>
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                  color === 'primary' ? 'bg-primary/15' : color === 'emerald' ? 'bg-emerald-500/15' : 'bg-blue-500/15'
-                }`}>
-                  <Icon className={`w-4 h-4 ${color === 'primary' ? 'text-primary' : color === 'emerald' ? 'text-emerald-400' : 'text-blue-400'}`} />
-                </div>
-                <div>
-                  <p className="text-white text-xs font-semibold leading-snug">{label}</p>
-                  <p className="text-muted-foreground/70 text-[10px] leading-tight mt-0.5">{desc}</p>
-                </div>
-              </motion.div>
+          {/* Stats strip */}
+          <div className="relative z-10 flex justify-between pt-5 mt-4 border-t border-white/[0.06]">
+            {[['847', 'Transactions'], ['18%', 'Savings Rate'], ['Top 12%', 'Health Rank']].map(([val, lbl]) => (
+              <div key={lbl} className="text-center">
+                <p className="font-mono font-bold text-white text-base">{val}</p>
+                <p className="text-[10px] text-muted-foreground/60">{lbl}</p>
+              </div>
             ))}
-          </motion.div>
-        </div>
-
-        {/* Radar chart */}
-        <motion.div variants={itemVariants}
-          className="glass-float rounded-3xl p-5 border border-white/8 card-premium">
-          <h3 className="text-sm font-semibold text-white mb-4">DNA Radar</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="75%" data={dnaData}>
-                <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                <Radar name="DNA" dataKey="A" stroke="hsl(var(--primary))" strokeWidth={2} fill="hsl(var(--primary))" fillOpacity={0.15} />
-              </RadarChart>
-            </ResponsiveContainer>
           </div>
         </motion.div>
 
-        {/* Challenges */}
-        <div>
-          <div className="flex items-center gap-2 px-1 mb-3">
-            <Star className="w-4 h-4 text-primary" />
-            <h3 className="text-sm font-semibold text-white">Active Challenges</h3>
-          </div>
-          <motion.div variants={staggerContainer} className="space-y-3">
-            {CHALLENGES.map((ch) => (
-              <motion.div key={ch.label} variants={itemVariants}
-                className={`glass-float rounded-2xl p-4 border card-premium ${ch.done ? 'border-primary/20 bg-primary/5' : 'border-white/5'}`}>
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <p className={`text-sm font-medium ${ch.done ? 'line-through opacity-50 text-white' : 'text-white'}`}>{ch.label}</p>
-                  {ch.done
-                    ? <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                    : <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap flex-shrink-0">
-                        {ch.progress}{ch.unit} / {ch.target}{ch.unit}
-                      </span>
-                  }
-                </div>
-                {ch.done ? (
-                  <div className="flex items-center gap-1.5">
-                    <Trophy className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-xs text-primary font-bold uppercase tracking-wider">Completed · {ch.reward}</span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${ch.target > 0 ? (ch.progress / ch.target) * 100 : 0}%` }}
-                        transition={{ duration: 1, ease: 'easeOut' }}
-                        className="h-full rounded-full"
-                        style={{ background: ch.progress === 0 ? 'rgba(255,255,255,0.1)' : 'hsl(var(--primary))' }}
-                      />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1.5">Reward: {ch.reward}</p>
-                  </>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
+        <motion.div variants={staggerContainer} className="space-y-4">
 
-        {/* Digital Signature */}
-        <motion.div variants={itemVariants}
-          className="glass-float rounded-3xl p-5 border border-white/8 card-premium">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20">
-              <FileSignature className="w-4 h-4 text-primary" />
+          {/* ── Personal Information ── */}
+          <Section title="Personal Information">
+            <Row icon={User}    iconColor="gold"    label="Full Name"    value={name}  onClick={() => toast.info('Name editing — coming soon')} />
+            <Row icon={Mail}    iconColor="blue"    label="Email"        value={email} onClick={() => toast.info('Email editing — coming soon')} />
+            <Row icon={Phone}   iconColor="emerald" label="Phone"        value={phone} onClick={() => toast.info('Phone editing — coming soon')} />
+            <Row icon={MapPin}  iconColor="purple"  label="Address"      value="Riyadh, Saudi Arabia" onClick={() => toast.info('Address editing — coming soon')} />
+          </Section>
+
+          {/* ── Digital Identity ── */}
+          <Section title="Digital Identity">
+            <Row icon={Award}        iconColor="gold"   label="Identity Verified"   value="NID ending •••4821" badge="Verified" onClick={() => toast.info('Identity verification is complete')} />
+            <Row icon={Fingerprint}  iconColor="blue"   label="Biometric Login"     toggle checked={biometric} onCheckedChange={setBiometric}
+              value={biometric ? 'Face ID & Fingerprint enabled' : 'Biometrics disabled'} />
+            <Row icon={PenTool}      iconColor="emerald" label="Digital Signature"  value="Certificate NB-SIG-2026-7731 · Active" onClick={() => toast.info('Opening signature vault')} />
+            <Row icon={BrainCircuit} iconColor="purple"  label="Financial DNA"      value="Smart Saver · Low Risk · Budget Disciplined" onClick={() => toast.info('Viewing DNA profile')} />
+          </Section>
+
+          {/* ── Security ── */}
+          <Section title="Security">
+            <Row icon={KeyRound}   iconColor="gold"    label="Change PIN"        value="Last changed 3 months ago" onClick={() => toast.info('PIN change flow — coming soon')} />
+            <Row icon={Shield}     iconColor="emerald" label="Two-Factor Auth"   toggle checked={twoFA} onCheckedChange={v => { setTwoFA(v); toast.success(v ? '2FA enabled' : '2FA disabled'); }} value={twoFA ? 'SMS + Authenticator App' : 'Disabled'} />
+            <Row icon={Smartphone} iconColor="blue"    label="Active Sessions"   value="2 devices · This device + iPad" onClick={() => toast.info('Session manager — coming soon')} />
+            <Row icon={Eye}        iconColor="cyan"    label="Login History"     value="Last login: Today 2:41 PM" onClick={() => toast.info('Viewing login history')} />
+            <Row icon={CreditCard} iconColor="amber"   label="Manage Cards"      value="1 active card · •••• 8821" onClick={() => toast.info('Opening card management')} />
+          </Section>
+
+          {/* ── Notifications ── */}
+          <Section title="Notifications">
+            <Row icon={Bell}    iconColor="gold"    label="Transactions"   toggle checked={notifications.txn}   onCheckedChange={v => setNotifications(p => ({...p,txn:v}))}   value={notifications.txn   ? 'All transactions notify you' : 'Off'} />
+            <Row icon={Bell}    iconColor="amber"   label="Bills & Dues"   toggle checked={notifications.bills} onCheckedChange={v => setNotifications(p => ({...p,bills:v}))} value={notifications.bills ? '24h before due date' : 'Off'} />
+            <Row icon={Sparkles}iconColor="purple"  label="AI Insights"    toggle checked={notifications.ai}    onCheckedChange={v => setNotifications(p => ({...p,ai:v}))}    value={notifications.ai    ? 'Daily morning briefing' : 'Off'} />
+            <Row icon={Shield}  iconColor="red"     label="Fraud Alerts"   toggle checked={notifications.fraud} onCheckedChange={v => setNotifications(p => ({...p,fraud:v}))} value="Critical · Always on" />
+            <Row icon={Activity}iconColor="blue"    label="Goal Milestones" toggle checked={notifications.goals} onCheckedChange={v => setNotifications(p => ({...p,goals:v}))} value={notifications.goals ? 'When goals are reached' : 'Off'} />
+          </Section>
+
+          {/* ── Privacy ── */}
+          <Section title="Privacy">
+            <Row icon={Eye}    iconColor="blue"    label="Usage Analytics"     toggle checked={privacy.analytics}    onCheckedChange={v => setPrivacy(p => ({...p,analytics:v}))}    value={privacy.analytics    ? 'Help improve the app' : 'Off'} />
+            <Row icon={Sparkles}iconColor="gold"   label="Personalized AI"    toggle checked={privacy.personalized} onCheckedChange={v => setPrivacy(p => ({...p,personalized:v}))} value={privacy.personalized ? 'AI learns your habits' : 'Off'} />
+            <Row icon={Trash2} iconColor="red"     label="Clear Financial Data"  onClick={() => toast.error('This action cannot be undone — requires PIN confirmation')} />
+          </Section>
+
+          {/* ── Preferences ── */}
+          <Section title="Preferences">
+            {/* Theme */}
+            <div className="px-4 py-3.5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-xl bg-primary/12 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  {theme === 'dark' ? <Moon className="w-3.5 h-3.5 text-primary"/> : theme === 'light' ? <Sun className="w-3.5 h-3.5 text-primary"/> : <Sparkles className="w-3.5 h-3.5 text-primary"/>}
+                </div>
+                <p className="text-white text-sm font-medium flex-1">Theme</p>
+              </div>
+              <div className="flex gap-2">
+                {(['dark','light','auto'] as const).map(t => (
+                  <motion.button key={t} whileTap={{ scale: 0.93 }} onClick={() => { setTheme(t); toast.success(`${t.charAt(0).toUpperCase()+t.slice(1)} mode applied`); }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${theme===t?'bg-primary text-black':'bg-white/5 border border-white/8 text-muted-foreground hover:text-white'}`}>
+                    {t}
+                  </motion.button>
+                ))}
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm">Digital Signature</h3>
-              <p className="text-muted-foreground/70 text-xs">Used for secure contracts</p>
-            </div>
-          </div>
-          <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 flex flex-col items-center justify-center min-h-[100px] relative">
-            {user?.signatureData ? (
-              <>
-                <img
-                  src={user.signatureData}
-                  alt="Digital Signature"
-                  className="max-h-[70px] max-w-full opacity-80 mix-blend-screen drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]"
-                  style={{ filter: 'invert(1) sepia(1) saturate(2) hue-rotate(10deg)' }}
-                />
-                <div className="absolute top-2 right-2 bg-emerald-500/15 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1">
-                  <CheckCircle2 className="w-2.5 h-2.5" /> Verified
+            {/* Language */}
+            <div className="px-4 py-3.5 border-t border-white/[0.04]">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/12 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Globe className="w-3.5 h-3.5 text-blue-400" />
                 </div>
-              </>
-            ) : (
-              <p className="text-muted-foreground/50 text-sm italic">No signature recorded</p>
-            )}
-          </div>
-        </motion.div>
+                <p className="text-white text-sm font-medium flex-1">Language</p>
+              </div>
+              <div className="flex gap-2">
+                {[{key:'en',label:'English'},{key:'ar',label:'العربية'}].map(l => (
+                  <motion.button key={l.key} whileTap={{ scale: 0.93 }} onClick={() => { setLanguage(l.key as 'en' | 'ar'); toast.success(`Language set to ${l.label}`); }}
+                    className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all ${language===l.key?'bg-primary text-black':'bg-white/5 border border-white/8 text-muted-foreground hover:text-white'}`}>
+                    {l.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </Section>
 
+          {/* ── Help & Support ── */}
+          <Section title="Help & Support">
+            <Row icon={HelpCircle}   iconColor="blue"   label="Help Center"     value="FAQs, guides, tutorials"     onClick={() => toast.info('Opening Help Center')} />
+            <Row icon={MessageCircle}iconColor="emerald" label="Live Chat"      value="Average response: 2 min"      onClick={() => toast.success('Connecting to support agent…')} badge="Online" />
+            <Row icon={Mail}         iconColor="gold"   label="Email Support"   value="support@nabeeh.bank"          onClick={() => toast.info('Opening email client')} />
+            <Row icon={Activity}     iconColor="purple" label="System Status"   value="All systems operational · 99.9% uptime" onClick={() => toast.info('All systems are fully operational')} />
+          </Section>
+
+          {/* ── About ── */}
+          <Section title="About">
+            <Row icon={Sparkles} iconColor="gold"  label="Nabeeh Bank Ultra" value="Version 2.0.0 · Build 2026.07" onClick={() => toast.info('Nabeeh Bank V2 Ultra — The world\'s smartest AI banking experience')} />
+            <Row icon={Lock}     iconColor="blue"  label="Privacy Policy"    value="Last updated June 2026" onClick={() => toast.info('Opening Privacy Policy')} />
+            <Row icon={Shield}   iconColor="emerald" label="Terms of Service" value="Nabeeh Bank · Saudi Arabia"   onClick={() => toast.info('Opening Terms of Service')} />
+          </Section>
+
+          {/* ── Sign Out ── */}
+          <motion.div variants={itemVariants}>
+            <div className="space-y-2">
+              <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
+                onClick={handleLogout}
+                className="w-full py-3.5 rounded-2xl border border-red-500/20 text-red-400 font-semibold text-sm flex items-center justify-center gap-2 hover:bg-red-500/8 transition-colors"
+                style={{ background: 'rgba(239,68,68,0.04)' }}>
+                <LogOut className="w-4 h-4" /> Sign Out
+              </motion.button>
+              <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}
+                onClick={() => toast.error('Account deletion requires in-person verification at a Nabeeh branch.')}
+                className="w-full py-3 rounded-2xl text-red-500/60 text-xs font-medium hover:text-red-400 transition-colors">
+                Delete Account
+              </motion.button>
+            </div>
+          </motion.div>
+
+        </motion.div>
       </motion.div>
     </DashboardLayout>
   );
