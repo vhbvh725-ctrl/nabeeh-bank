@@ -1,0 +1,542 @@
+You are a world-class FinTech product team consisting of:
+- Senior UX/UI Designer
+- Full Stack Engineer
+- AI Product Engineer
+- Banking Security Expert
+
+Your mission is to build a premium Hackathon prototype called:
+
+"Nabeeh Bank V2 Ultra"
+
+A next-generation intelligent digital banking platform powered by AI.
+
+The goal is NOT to create a traditional banking app.
+
+The goal is to create a futuristic financial assistant that understands the user's money, predicts problems, prevents fraud, and helps users make better financial decisions.
+
+The experience should feel inspired by:
+- Apple Wallet
+- Revolut
+- Monzo
+- Stripe
+- Linear
+- Notion
+
+with a premium Arabic banking identity.
+
+==================================================
+
+CORE IDEA:
+
+Nabeeh Bank is an AI-powered digital bank that combines:
+
+1. Digital banking services
+2. Personal AI financial advisor
+3. Fraud prevention system
+4. Smart financial planning
+5. Digital signatures and remote banking
+
+The AI assistant is called:
+
+"Nabeh AI"
+
+It should feel alive inside the application.
+
+==================================================
+
+DESIGN REQUIREMENTS:
+
+Create a futuristic premium mobile banking interface.
+
+The design should include:
+
+- Glassmorphism cards
+- Smooth animations
+- 3D banking card
+- Dynamic backgrounds
+- Soft lighting effects
+- Premium dark mode
+- Arabic RTL support
+- Mobile-first experience
+
+Every interaction should feel like a modern iOS application.
+
+Examples:
+
+- Cards move smoothly when touched
+- Transactions have elegant animations
+- Notifications slide naturally
+- Pages transition smoothly
+- Buttons have micro-interactions
+
+The application should look like a real banking product, not a student project.
+
+==================================================
+
+APPLICATION FLOW:
+
+## 1. Splash Screen
+
+When opening the application:
+
+Show:
+
+NABEEH BANK
+
+"Your intelligent financial companion"
+
+Beautiful animation.
+
+Then move to:
+
+Login / Create Account.
+
+==================================================
+
+## 2. Authentication
+
+Create:
+
+Login Screen:
+
+- Email
+- Password
+- Face ID / Biometric button
+- Remember me
+
+Create Account Screen:
+
+Fields:
+
+- Full Name
+- Email
+- Phone number
+- Password
+
+Additional feature:
+
+Digital Signature Setup:
+
+User uploads handwritten signature.
+
+System shows:
+
+"Your digital signature has been uploaded successfully.
+It will be used for secure electronic contracts."
+
+==================================================
+
+## 3. HOME DASHBOARD
+
+The main screen should be a Financial Command Center.
+
+Instead of only showing balance:
+
+Show:
+
+Good morning Ahmed 👋
+
+Financial Health Score:
+
+91%
+
+Current Balance:
+
+25,450 SAR
+
+Savings Goal:
+
+68%
+
+Remaining days until salary:
+
+9 days
+
+
+Include:
+
+- Animated bank card
+- Cash flow chart
+- Spending analysis
+- Smart insights
+- AI recommendations
+
+
+==================================================
+
+## 4. NABEH AI ASSISTANT
+
+This is the heart of the application.
+
+Do NOT make it only a chatbot.
+
+It should proactively talk to users.
+
+Examples:
+
+
+Morning message:
+
+"Good morning Ahmed 👋
+
+I noticed your savings increased by 18% this month.
+
+Great progress."
+
+
+Smart cards:
+
+🟢 Saving opportunity
+
+🔵 Monthly prediction
+
+🟠 Unused subscription detected
+
+🔴 Fraud warning
+
+
+==================================================
+
+AI FEATURES:
+
+## Expense Analysis
+
+User asks:
+
+"Show me my spending this month"
+
+AI generates:
+
+Beautiful charts:
+
+Food:
+1200 SAR
+
+Shopping:
+800 SAR
+
+Bills:
+500 SAR
+
+Savings:
+1500 SAR
+
+
+Include:
+
+- Pie charts
+- Timeline charts
+- Spending trends
+
+
+==================================================
+
+## Future Balance Prediction
+
+AI analyzes:
+
+Income
+Expenses
+Bills
+Saving behavior
+
+
+Example:
+
+"You will have approximately 3,200 SAR remaining at the end of this month."
+
+
+==================================================
+
+## Smart Saving Advisor
+
+AI detects unused money.
+
+
+Example:
+
+"You have 500 SAR that has not been used for 6 months.
+
+Would you like to improve your financial future?"
+
+
+Options:
+
+1.
+Move to savings account
+
+2.
+Create emergency fund
+
+3.
+Explore investment opportunities
+
+
+Show investment suggestions:
+
+Example:
+
+"Gold prices are currently lower compared to previous months.
+
+This could be an opportunity to explore."
+
+
+Display:
+
+- Charts
+- Growth simulation
+- Future projection
+
+
+==================================================
+
+## Smart Bill Assistant
+
+AI detects bills.
+
+
+Example:
+
+"I noticed your internet bill has not been paid.
+
+Would you like me to help you complete the payment?"
+
+
+Buttons:
+
+Pay now
+
+Remind me later
+
+
+==================================================
+
+# FRAUD PROTECTION SYSTEM
+
+Create an impressive fraud detection demo.
+
+
+Scenario:
+
+A suspicious withdrawal happens:
+
+"Are you the person who requested a withdrawal of 50,000 SAR?"
+
+
+Buttons:
+
+YES
+
+NO
+
+
+If user selects NO:
+
+Show:
+
+"Are you sure?"
+
+Buttons:
+
+Confirm Fraud
+
+Cancel
+
+
+If Confirm Fraud:
+
+AI automatically:
+
+- Freezes bank card
+- Creates fraud report
+- Sends information to bank branch
+- Creates replacement card request
+
+
+Show messages:
+
+"Your card has been temporarily frozen."
+
+"Fraud report created successfully."
+
+"Your replacement card request has been submitted."
+
+
+Make this experience cinematic.
+
+==================================================
+
+# DIGITAL CONTRACT SYSTEM
+
+Create electronic signing system.
+
+Example:
+
+Loan contract:
+
+"Please upload your signature"
+
+User uploads signature.
+
+AI verifies:
+
+"Signature uploaded successfully."
+
+"The contract is now under review."
+
+
+Use cases:
+
+- Loans
+- Agreements
+- Banking documents
+
+==================================================
+
+# BEFORE YOU PAY FEATURE
+
+Before important transactions:
+
+AI warns user.
+
+
+Example:
+
+"You are about to transfer 5,000 SAR.
+
+After this transaction your balance will be 820 SAR until your next salary.
+
+Would you like to continue?"
+
+
+This makes AI part of decision making.
+
+==================================================
+
+# FINANCIAL DNA
+
+Create a financial personality profile.
+
+
+Example:
+
+Your Financial DNA:
+
+- Smart saver
+- Low risk investor
+- Strong budgeting habits
+
+
+AI recommendations:
+
+"Reduce restaurant spending by 15% to reach your car goal faster."
+
+
+==================================================
+
+# FINANCIAL CHALLENGES
+
+Add gamification.
+
+
+Example:
+
+Weekly Challenge:
+
+"Save 100 SAR this week"
+
+Reward:
+
+Achievement badge
+
+
+==================================================
+
+# ADMIN / BANK VIEW
+
+Create simple admin dashboard:
+
+- Fraud alerts
+- Customer reports
+- Contract reviews
+- AI insights
+
+
+==================================================
+
+# MAIN TECHNOLOGY
+
+Build using:
+
+Frontend:
+React + TypeScript
+Tailwind CSS
+Framer Motion
+Modern UI components
+
+Backend:
+Node.js
+Express
+TypeScript
+Prisma ORM
+PostgreSQL
+
+Authentication:
+JWT
+bcrypt
+
+AI:
+Create AI simulation layer with realistic responses.
+
+Charts:
+Use modern interactive charts.
+
+==================================================
+
+# DEMO EXPERIENCE
+
+The final prototype should demonstrate:
+
+A user opens the app.
+
+AI welcomes him.
+
+AI analyzes his money.
+
+AI detects unused money.
+
+AI suggests saving.
+
+AI detects suspicious transaction.
+
+AI protects his account.
+
+AI helps sign a digital contract.
+
+The judges should feel:
+
+"This is the future of banking."
+
+==================================================
+
+Important:
+
+Do not build a simple banking dashboard.
+
+Build a futuristic AI financial operating system.
+
+Every screen must look production-ready.
+
+Focus on:
+- Premium UX
+- AI interaction
+- Banking innovation
+- Real-world usefulness
+
+Project name:
+
+Nabeeh Bank V2 Ultra
+
+Tagline:
+
+"The bank that understands your future."
