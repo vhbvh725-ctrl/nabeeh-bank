@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useGetDashboard, useGetTransactions, useGetSpending, useGetInsights } from '@workspace/api-client-react';
 import { DashboardLayout } from '../../components/dashboard-layout';
 import { useRequireAuth } from '../../hooks/use-require-auth';
@@ -103,6 +103,58 @@ const mockCashFlowData = [
   { month: 'May', income: 15000, expenses: 3500 },
   { month: 'Jun', income: 16000, expenses: 3100 },
 ];
+
+const ROTATING_INSIGHTS = [
+  { icon: '🎉', text: 'Great job! You spent 18% less on restaurants this month.', color: 'emerald' },
+  { icon: '⚡', text: 'Your internet bill is due tomorrow. Tap to pay now.', color: 'amber' },
+  { icon: '💰', text: 'You can safely save SAR 500 today without affecting your balance.', color: 'primary' },
+  { icon: '📈', text: 'Your savings grew by 12% this quarter. Excellent discipline.', color: 'blue' },
+  { icon: '🔒', text: 'No suspicious activity detected. Your account is fully protected.', color: 'emerald' },
+];
+
+function RotatingInsightBanner() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setCurrentIndex(i => (i + 1) % ROTATING_INSIGHTS.length);
+        setVisible(true);
+      }, 350);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const insight = ROTATING_INSIGHTS[currentIndex];
+  const colorMap: Record<string, string> = {
+    emerald: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400',
+    amber: 'border-amber-500/30 bg-amber-500/5 text-amber-400',
+    primary: 'border-primary/30 bg-primary/5 text-primary',
+    blue: 'border-blue-500/30 bg-blue-500/5 text-blue-400',
+  };
+
+  return (
+    <motion.div
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 4 }}
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
+      className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl border glass ${colorMap[insight.color]}`}
+    >
+      <span className="text-lg flex-shrink-0">{insight.icon}</span>
+      <p className="text-sm font-medium flex-1">{insight.text}</p>
+      <div className="flex gap-1 flex-shrink-0">
+        {ROTATING_INSIGHTS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setCurrentIndex(i); setVisible(true); }}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-current w-4' : 'bg-current opacity-30'}`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function DashboardHome() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -225,6 +277,9 @@ export default function DashboardHome() {
             />
           </motion.div>
         </motion.div>
+
+        {/* Section 2.5: Rotating AI Insight Banner */}
+        <RotatingInsightBanner />
 
         {/* Section 3: Quick Stats */}
         <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 gap-4">

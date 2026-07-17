@@ -1,0 +1,351 @@
+You are NOT rebuilding the project.
+
+You are improving the existing Nabeeh Bank V2 Ultra prototype.
+
+Keep the current color palette, animations, branding and layout.
+
+The objective is to transform the application into a premium Hackathon-winning banking experience.
+
+=====================================================
+
+GENERAL RULES
+
+Do NOT simplify anything.
+
+Keep the existing UI.
+
+Only improve it.
+
+Every animation must feel like iOS.
+
+Every card should have subtle hover, touch and transition effects.
+
+The application should feel like a real banking product from 2030.
+
+=====================================================
+
+1. IMPROVE NABEH AI PAGE
+
+The current AI page feels like a chatbot.
+
+I don't want a chatbot.
+
+Transform it into a Financial Command Center.
+
+The top of the page should say:
+
+Good morning, Ahmed 👋
+
+Then show:
+
+"I've analyzed your financial activity overnight."
+
+Under it create smart AI cards.
+
+--------------------------------
+
+Card 1
+
+Financial Health
+
+91 / 100
+
+"Excellent financial stability."
+
+--------------------------------
+
+Card 2
+
+Prediction
+
+Expected balance at month end
+
+SAR 3,280
+
+Confidence
+
+96%
+
+--------------------------------
+
+Card 3
+
+Savings Opportunity
+
+"You have SAR 500 sitting unused for more than six months."
+
+Buttons
+
+Move to Savings
+
+Emergency Fund
+
+Investment Ideas
+
+--------------------------------
+
+Card 4
+
+Bills
+
+Internet Bill
+
+Due Tomorrow
+
+Buttons
+
+Pay Now
+
+Remind Me Later
+
+--------------------------------
+
+Card 5
+
+Fraud Protection
+
+"No suspicious activity detected."
+
+Status indicator:
+
+Protected
+
+--------------------------------
+
+Card 6
+
+Goal Progress
+
+Car Goal
+
+68%
+
+Expected completion
+
+February 2027
+
+--------------------------------
+
+After these cards,
+
+keep the AI chat interface.
+
+The chat becomes a secondary feature.
+
+=====================================================
+
+2. SMART AI EXAMPLES
+
+Add quick action suggestions.
+
+Examples:
+
+Show my spending
+
+Predict my balance
+
+Analyze subscriptions
+
+Investment ideas
+
+Savings advice
+
+Emergency fund
+
+Financial health
+
+Car plan
+
+Home purchase
+
+Retirement planning
+
+=====================================================
+
+3. EXPENSE ANALYSIS
+
+When the user asks:
+
+"Show my spending"
+
+Display beautiful charts.
+
+Food
+
+Shopping
+
+Bills
+
+Transport
+
+Entertainment
+
+Savings
+
+Display:
+
+Pie chart
+
+Bar chart
+
+Timeline
+
+Monthly comparison
+
+=====================================================
+
+4. SMART SAVINGS
+
+AI automatically detects unused money.
+
+Example:
+
+"You have SAR 500 that hasn't moved for six months."
+
+Suggested actions:
+
+Move to Savings
+
+Create Emergency Fund
+
+Explore Gold Investment
+
+Explore Sukuk
+
+Simulate Future Growth
+
+=====================================================
+
+5. FRAUD DEMO
+
+Create a cinematic fraud scenario.
+
+Popup:
+
+Security Alert
+
+A withdrawal request of SAR 50,000 has been detected.
+
+Was this you?
+
+Buttons
+
+YES
+
+NO
+
+If user clicks NO
+
+Show confirmation.
+
+Are you sure this transaction is unauthorized?
+
+Buttons
+
+Confirm Fraud
+
+Cancel
+
+If Confirm Fraud:
+
+Animate:
+
+Card Frozen
+
+Fraud Report Created
+
+Bank Branch Notified
+
+Replacement Card Requested
+
+Show success screen with premium animation.
+
+=====================================================
+
+6. DIGITAL SIGNATURE PAGE
+
+Keep the current signature canvas.
+
+After pressing Finalize Creation,
+
+DO NOT instantly leave.
+
+Instead show an animated verification process.
+
+Example:
+
+Encrypting Signature...
+
+Identity Verified
+
+AI Validation Complete
+
+Digital Certificate Created
+
+Contract Submitted
+
+Finally display:
+
+"Your electronic signature has been securely linked to your Nabeeh identity."
+
+Button
+
+Continue
+
+=====================================================
+
+7. DASHBOARD IMPROVEMENTS
+
+Below Total Balance,
+
+add an AI Insight card.
+
+Example:
+
+Great job!
+
+You spent 18% less on restaurants this month.
+
+OR
+
+Your internet bill is due tomorrow.
+
+OR
+
+You can safely save SAR 500 today.
+
+These insights should rotate dynamically.
+
+=====================================================
+
+8. MICRO ANIMATIONS
+
+Improve every interaction.
+
+Buttons scale slightly.
+
+Cards float softly.
+
+Charts animate.
+
+Notifications slide naturally.
+
+Numbers count up smoothly.
+
+Cards have subtle lighting effects.
+
+=====================================================
+
+9. FINAL EXPERIENCE
+
+The application should no longer feel like:
+
+A banking app with AI.
+
+It should feel like:
+
+An AI operating system for personal finance.
+
+The judges should immediately understand that Nabeeh AI actively monitors, protects, predicts and improves the user's financial life.
+
+Maintain all existing styling while significantly improving the intelligence, interaction and storytelling of the application.

@@ -18,7 +18,7 @@ export function FraudModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
   const handleConfirmFraud = () => {
     setStep(3);
-    const delays = [0, 600, 1200, 1800];
+    const delays = [500, 1200, 2000, 2800];
     delays.forEach((delay, index) => {
       setTimeout(() => {
         setProcessingItems(prev => {
@@ -30,89 +30,180 @@ export function FraudModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     });
   };
 
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => { setStep(1); setProcessingItems([false, false, false, false]); }, 400);
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md glass rounded-3xl border border-red-500/30 overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.15)] bg-gradient-to-b from-red-950/40 to-black"
-      >
-        <div className="p-6 md:p-8">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
-                  <ShieldAlert className="w-8 h-8" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-4">Security Alert</h2>
-                <p className="text-white/80 mb-8">Are you the person who requested a withdrawal of <span className="font-mono text-red-400 font-bold">50,000 SAR</span> from your account?</p>
-                <div className="space-y-3">
-                  <button onClick={() => { toast.success("Verified successfully."); onClose(); setStep(1); }} className="w-full py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors font-medium">
-                    Yes, that was me
-                  </button>
-                  <button onClick={() => setStep(2)} className="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500/20 transition-colors font-medium">
-                    No, that was NOT me
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center">
-                <h2 className="text-xl font-bold text-white mb-4">Confirm Unauthorized Activity</h2>
-                <p className="text-white/70 text-sm mb-8">Confirming will immediately freeze your card and file a formal fraud report with Nabeeh Security.</p>
-                <div className="space-y-3">
-                  <button onClick={handleConfirmFraud} className="w-full py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-bold shadow-lg shadow-red-500/20">
-                    Confirm Fraud
-                  </button>
-                  <button onClick={() => setStep(1)} className="w-full py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors font-medium">
-                    Cancel
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-                <div className="relative w-20 h-20 mx-auto mb-6">
-                  <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 rounded-full border-t-2 border-primary border-r-2 border-transparent"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <ShieldCheck className="w-8 h-8 text-primary" />
-                  </div>
-                </div>
-                <div className="space-y-4 text-left mb-8 max-w-[240px] mx-auto">
-                  {[
-                    "Card frozen successfully",
-                    "Fraud report filed",
-                    "Branch notified",
-                    "Replacement card requested"
-                  ].map((text, i) => (
-                    <div key={text} className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-300 ${processingItems[i] ? 'bg-primary text-black' : 'bg-white/10 text-transparent'}`}>
-                        <CheckCircle2 className="w-3 h-3" />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+            className="w-full max-w-sm glass rounded-3xl border border-red-500/40 overflow-hidden shadow-[0_0_60px_rgba(239,68,68,0.2)] bg-gradient-to-b from-red-950/50 to-black/90"
+          >
+            <div className="p-7">
+              <AnimatePresence mode="wait">
+                {/* Step 1: Was this you? */}
+                {step === 1 && (
+                  <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center">
+                    {/* Pulsing alert icon */}
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                      <motion.div
+                        className="absolute inset-0 rounded-full bg-red-500/20"
+                        animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <div className="absolute inset-0 rounded-full bg-red-500/15 border border-red-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                        <ShieldAlert className="w-9 h-9 text-red-400" />
                       </div>
-                      <span className={`text-sm transition-colors duration-300 ${processingItems[i] ? 'text-white' : 'text-white/40'}`}>{text}</span>
                     </div>
-                  ))}
-                </div>
-                {processingItems[3] && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                    <p className="text-lg font-bold text-primary mb-6">Your account is now secure.</p>
-                    <button onClick={() => { onClose(); setTimeout(() => setStep(1), 500); setProcessingItems([false,false,false,false]); }} className="w-full py-3 rounded-xl border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-medium">
-                      Done
-                    </button>
+
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-red-400 font-semibold mb-3">Security Alert</p>
+                    <h2 className="text-2xl font-bold text-white mb-3">Suspicious Activity</h2>
+                    <p className="text-white/70 text-sm leading-relaxed mb-2">
+                      A withdrawal request of
+                    </p>
+                    <p className="text-3xl font-mono font-bold text-red-400 mb-2">SAR 50,000</p>
+                    <p className="text-white/70 text-sm mb-8">has been detected on your account.</p>
+                    <p className="text-white font-semibold mb-5">Was this you?</p>
+
+                    <div className="space-y-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => { toast.success('Transaction verified. All clear.'); handleClose(); }}
+                        className="w-full py-3.5 rounded-xl border border-white/15 text-white bg-white/5 hover:bg-white/10 transition-colors font-semibold tracking-wide text-sm"
+                      >
+                        YES — That was me
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => setStep(2)}
+                        className="w-full py-3.5 rounded-xl bg-red-500/15 border border-red-500/50 text-red-400 hover:bg-red-500/25 transition-colors font-bold tracking-wide text-sm shadow-[0_0_20px_rgba(239,68,68,0.15)]"
+                      >
+                        NO — This is unauthorized
+                      </motion.button>
+                    </div>
                   </motion.div>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-    </div>
+
+                {/* Step 2: Confirm Fraud */}
+                {step === 2 && (
+                  <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-red-900/40 border border-red-500/40 flex items-center justify-center mx-auto mb-6">
+                      <ShieldAlert className="w-8 h-8 text-red-400" />
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-3">Confirm Unauthorized Transaction</h2>
+                    <p className="text-white/60 text-sm leading-relaxed mb-8">
+                      Are you sure this transaction is unauthorized?<br />
+                      <span className="text-white/40 text-xs mt-1 block">Confirming will immediately freeze your card and file a formal fraud report with Nabeeh Security.</span>
+                    </p>
+                    <div className="space-y-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={handleConfirmFraud}
+                        className="w-full py-3.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-bold shadow-[0_0_25px_rgba(239,68,68,0.3)] text-sm"
+                      >
+                        Confirm Fraud
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => setStep(1)}
+                        className="w-full py-3.5 rounded-xl border border-white/10 text-white/70 hover:text-white hover:bg-white/5 transition-colors font-medium text-sm"
+                      >
+                        Cancel
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Step 3: Cinematic success */}
+                {step === 3 && (
+                  <motion.div key="s3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                    {/* Spinning shield */}
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                        className="absolute inset-0 rounded-full border-t-2 border-r-2 border-primary border-b-2 border-b-transparent border-l-2 border-l-transparent"
+                      />
+                      <motion.div
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+                        className="absolute inset-2 rounded-full border-t-2 border-l-2 border-red-500/40 border-r-2 border-r-transparent border-b-2 border-b-transparent"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <ShieldCheck className="w-9 h-9 text-primary" />
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Nabeeh Security Response</p>
+                    <h2 className="text-xl font-bold text-white mb-6">Securing Your Account</h2>
+
+                    <div className="space-y-3 text-left mb-8 max-w-[260px] mx-auto">
+                      {[
+                        'Card Frozen',
+                        'Fraud Report Created',
+                        'Bank Branch Notified',
+                        'Replacement Card Requested',
+                      ].map((text, i) => (
+                        <motion.div
+                          key={text}
+                          initial={{ opacity: 0.2 }}
+                          animate={processingItems[i] ? { opacity: 1 } : { opacity: 0.2 }}
+                          className="flex items-center gap-3"
+                        >
+                          <motion.div
+                            className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${processingItems[i] ? 'bg-primary shadow-[0_0_8px_rgba(212,175,55,0.5)]' : 'bg-white/10'}`}
+                          >
+                            {processingItems[i]
+                              ? <CheckCircle2 className="w-3.5 h-3.5 text-black" />
+                              : <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
+                            }
+                          </motion.div>
+                          <span className={`text-sm font-medium transition-colors duration-500 ${processingItems[i] ? 'text-white' : 'text-white/30'}`}>
+                            {text}
+                          </span>
+                          {processingItems[i] && (
+                            <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="ml-auto text-primary text-xs font-bold">✓</motion.span>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <AnimatePresence>
+                      {processingItems[3] && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                          <div className="h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent mb-5" />
+                          <p className="text-primary font-bold text-lg mb-1">Your account is now secure.</p>
+                          <p className="text-muted-foreground text-xs mb-6">A new card will be delivered within 3 business days.</p>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                            onClick={handleClose}
+                            className="w-full py-3 rounded-xl border border-primary/40 text-primary hover:bg-primary/10 transition-colors font-semibold shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                          >
+                            Done
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
